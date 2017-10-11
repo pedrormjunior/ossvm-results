@@ -4,155 +4,241 @@ library(tidyr)
 options(width=180)
 options(scipen=100)
 
-digits=10
-nsmall=10
+digits <- 10
+nsmall <- 10
 
+verbose2 <- function(expr) print(expr)
+## verbose2 <- function(expr) NULL #comment this line for verbose output;
 verbose <- function(expr) print(expr)
-## verbose <- function(expr) NULL
+## verbose <- function(expr) NULL #comment this line for EVEN MORE
+                               #verbose output; if you comment this
+                               #line, comment the verbose2 NULL line
+                               #as well;
 
-run <- function(metric) {
-    print(paste0(">>>>>>>>>>>>>>>> ", toupper(metric), " <<<<<<<<<<<<<<<<"))
-    nacc = read.csv(paste0("stat___", metric, ".csv"))
+proposed_method_open <- "ssvmO"
+proposed_method_closed <- "ssvmC"
+proposed_method <- "ssvm"
 
-    proposed_method_open = "ssvmO"
-    proposed_method_closed = "ssvmC"
-    baselines_open <- c("svmO", "ocsvmO", "svmdbcO", "onevsetO", "wsvmO", "pisvmO")
-    baselines_closed <- c("svmC", "ocsvmC", "svmdbcC", "onevsetC", "wsvmC", "pisvmC")
-    classifiers_open <- c("svmO", "ocsvmO", "svmdbcO", "onevsetO", "wsvmO", "pisvmO", "ssvmO")
-    classifiers_closed <- c("svmC", "ocsvmC", "svmdbcC", "onevsetC", "wsvmC", "pisvmC", "ssvmC")
-    classifiers <- c("svm", "ocsvm", "svmdbc", "onevset", "wsvm", "pisvm", "ssvm")
+classifiers_open <- c("svmO", "ocsvmO", "svmdbcO", "onevsetO", "wsvmO", "pisvmO", "svddO", proposed_method_open)
+classifiers_closed <- c("svmC", "ocsvmC", "svmdbcC", "onevsetC", "wsvmC", "pisvmC", "svddC", proposed_method_closed)
+classifiers <- c("svm", "ocsvm", "svmdbc", "onevset", "wsvm", "pisvm", "svdd", proposed_method)
 
-    {   # Statistical tests for classifiers with OPEN-SET grid search.
-        {                               # Sign test
-            y = spread(nacc, classifier, result)
-            yy = y[, classifiers_open]
+classifiers_open_unbalanced <- classifiers_open[classifiers_open != 'wsvmO']
+classifiers_closed_unbalanced <- classifiers_closed[classifiers_closed != 'wsvmC']
+classifiers_open_ocbb <- c("ocbbsvmC", "ocbbsvmO", "ocbbsvm_OVO", "svddbbC", "svddbbO", "svddbb_OVO", proposed_method_open)
 
-            verbose("Winning cases (open)")
-            counter <- t(mapply(function(baseline) apply(apply(yy[, c(proposed_method_open, baseline)], 1, function(x) { x == max(x) }), 1, sum), baselines_open))
-            colnames(counter) = c(proposed_method_open, "other")
-            verbose(counter)
-            verbose(all(counter[, proposed_method_open] >= counter[, "other"]))
-            stopifnot(all(counter[, proposed_method_open] >= counter[, "other"]))
+stopifnot(length(classifiers_open) == length(classifiers_closed))
+stopifnot(tail(classifiers_open, 1) == proposed_method_open)
+stopifnot(tail(classifiers_closed, 1) == proposed_method_closed)
 
-            nn = dim(yy)[1]
-            p.values.raw = yy %>% summarize_each(funs(binom.test(sum(ssvmO > .), nn)$p.value),
-                                                 c(svmO, ocsvmO, svmdbcO, onevsetO, wsvmO, pisvmO))
-
-            verbose("Sign test (open) --- p-values with holm correction")
-            zz = round(p.adjust(as.numeric(p.values.raw[1, ]), method="holm"), 10)
-            names(zz) = baselines_open
-            verbose(as.matrix(zz))
-            print(format(unname(zz), nsmall=nsmall, digits=digits))
-        }
-
-
-        {                               # Wilcoxon test
-            verbose("Mean of the accuracy (open)")
-            aux <- as.matrix(colMeans(yy[, classifiers_open]))
-            verbose(aux)
-            verbose(paste("Winning method:", rownames(aux)[which.max(aux)]))
-            stopifnot(rownames(aux)[which.max(aux)] == proposed_method_open)
-
-            xnacc = nacc %>% group_by(lenacs, dataset, classifier) %>% summarise(nacc=mean(result))
-            y = spread(xnacc, classifier, nacc)
-            yy = y[, classifiers_open]
-
-            p.values.raw = yy %>% summarize_each(funs(wilcox.test(., ssvmO, paired=T)$p.value),
-                                                 c(svmO, ocsvmO, svmdbcO, onevsetO, wsvmO, pisvmO))
-
-            zz = round(p.adjust(as.numeric(p.values.raw[1, ]), method="holm"), 10)
-            names(zz) = baselines_open
-            verbose("Wilcoxon test (open) --- p-values with holm correction")
-            verbose(as.matrix(zz))
-            print(format(unname(zz), nsmall=nsmall, digits=digits))
-        }
-
+printLaTeXPValues <- function(metric, booleans, pvalues) {
+    ## booleans: if TRUE, it will indicate the expected result
+    ## happened; command \pvalue{pvalue}{boolean} should be properly
+    ## programmed in manuscript; it assumes \usepackage{glossaries} is
+    ## used in manuscript;
+    stopifnot(all(names(booleans) == names(pvalues)))
+    latexoutput <- data.frame(booleans, pvalues)
+    cat(sprintf("\\glstext{%s}", metric))
+    for(i in 1:nrow(latexoutput)) {
+        cat(sprintf(" & \\pvalue{%s}{%d}",
+                    format(latexoutput[i, 2], nsmall=nsmall, digits=digits),
+                    latexoutput[i, 1]))
     }
+    cat(" \\\\\n")
+}
 
-    { # Statistical tests for classifiers with CLOSED-SET grid search.
-        {                               # Sign test
-            y = spread(nacc, classifier, result)
-            yy = y[, classifiers_closed]
+read.stat.file <- function(metric, stat.file.type) {
+    stopifnot(stat.file.type == "normal" || stat.file.type == "ocbb" || stat.file.type == "unbalanced" || stat.file.type == "onlyImageNet")
+    switch(stat.file.type,
+           normal = read.csv(paste0("statcsv_ossvm_R1_normal/stat___", metric, ".csv")),
+           ocbb = read.csv(paste0("statcsv_ossvm_R1_normal_ocbb/stat___", metric, ".csv")),
+           unbalanced = read.csv(paste0("statcsv_ossvm_R1_unbalanced_open/stat___", metric, ".csv")),
+           onlyImageNet = read.csv(paste0("statcsv_ossvm_R1_onlyImageNet/stat___", metric, ".csv")))
+}
 
-            verbose("Winning cases (closed)")
-            counter <- t(mapply(function(baseline) apply(apply(yy[, c(proposed_method_closed, baseline)], 1, function(x) { x == max(x) }), 1, sum), baselines_closed))
-            colnames(counter) = c(proposed_method_closed, "other")
-            verbose(counter)
-            verbose(all(counter[, proposed_method_closed] >= counter[, "other"]))
-            stopifnot(all(counter[, proposed_method_closed] >= counter[, "other"]))
+runBinomial <- function(metric, classifiers, stat.file.type) {
+    verbose2(paste0(">>>>>>>>>>>>>>>> ", toupper(metric), " <<<<<<<<<<<<<<<<"))
+    stopifnot(classifiers[length(classifiers)] == proposed_method_open || classifiers[length(classifiers)] == proposed_method_closed)
+    proposed_method <- classifiers[length(classifiers)]
+    baselines <- classifiers[classifiers != proposed_method]
+    is.proposed.open <- proposed_method == proposed_method_open
 
-            nn = dim(yy)[1]
-            p.values.raw = yy %>% summarize_each(funs(binom.test(sum(ssvmC > .), nn)$p.value),
-                                                 c(svmC, ocsvmC, svmdbcC, onevsetC, wsvmC, pisvmC))
+    nacc <- read.stat.file(metric, stat.file.type)
+    y <- spread(nacc, classifier, result)
+    yy <- y[, classifiers]
 
-            verbose("Sign test (closed) --- p-values with holm correction")
-            zz = round(p.adjust(as.numeric(p.values.raw[1, ]), method="holm"), 10)
-            names(zz) = baselines_closed
-            verbose(as.matrix(zz))
-            print(format(unname(zz), nsmall=nsmall, digits=digits))
-        }
+    {
+        verbose(paste0("Sign test (", if(is.proposed.open) "open" else "closed", ") --- winning cases"))
+        counter <- t(mapply(function(baseline) apply(apply(yy[, c(proposed_method, baseline)], 1, function(x) { x == max(x) }), 1, sum), baselines))
+        colnames(counter) <- c(proposed_method, "other")
+        verbose(counter)
+        proposed_method_wins <- counter[, proposed_method] >= counter[, "other"]
+        verbose2(paste(paste0('(sign ', if(is.proposed.open) "open" else "closed", ') Methods with more winning cases than proposed method:'), paste(names(proposed_method_wins[! proposed_method_wins]), collapse=', ')))
+        ## stopifnot(all(proposed_method_wins))
 
-        {                               # Wilcoxon test
-            verbose("Mean of the accuracy (closed)")
-            aux <- as.matrix(colMeans(yy[, classifiers_closed]))
-            verbose(aux)
-            verbose(paste("Winning method:", rownames(aux)[which.max(aux)]))
-            stopifnot(rownames(aux)[which.max(aux)] == proposed_method_closed)
+        nn <- dim(yy)[1]
+        p.values.raw <- yy %>% summarize_each_(funs(binom.test(sum((if(is.proposed.open) ssvmO else ssvmC) > .), nn)$p.value), baselines)
 
-            xnacc = nacc %>% group_by(lenacs, dataset, classifier) %>% summarise(nacc=mean(result))
-            y = spread(xnacc, classifier, nacc)
-            yy = y[, classifiers_closed]
-
-            p.values.raw = yy %>% summarize_each(funs(wilcox.test(., ssvmC, paired=T)$p.value),
-                                                 c(svmC, ocsvmC, svmdbcC, onevsetC, wsvmC, pisvmC))
-
-            zz = round(p.adjust(as.numeric(p.values.raw[1, ]), method="holm"), 10)
-            names(zz) = baselines_closed
-            verbose("Wilcoxon test (closed) --- p-values with holm correction")
-            verbose(as.matrix(zz))
-            print(format(unname(zz), nsmall=nsmall, digits=digits))
-        }
-
-    }
-
-    { # Statistical tests comparing the open- vs closed-set grid search procedures applied to the methods.
-        {                               # Sign test
-            verbose("Open vs closed comparison --- winning cases")
-            acc_comparison <- t(mapply(function (o, c) {
-                c(sum(mapply(function(vo, vc) vo > vc, y[[o]], y[[c]])), sum(mapply(function(vo, vc) vo < vc, y[[o]], y[[c]]))) }, classifiers_open, classifiers_closed))
-            colnames(acc_comparison) <- c("open", "closed")
-            rownames(acc_comparison) <- classifiers
-            verbose(acc_comparison)
-            verbose(all(acc_comparison[, "open"] >= acc_comparison[, "closed"]))
-            ## stopifnot(all(acc_comparison[, "open"] >= acc_comparison[, "closed"]))
-
-            verbose("Sign test --- open vs close comparison --- p-values")
-            oxc = data.frame(alg=classifiers_open, p.value=rep(NA, length(classifiers_open)))
-            for (i in 1:7) oxc[i, 2] = round(binom.test(sum(y[[classifiers_open[i]]] > y[[classifiers_closed[i]]]), length(y[[classifiers_open[i]]]))$p.value, 10)
-            oxc$alg <- classifiers
-            verbose(oxc)
-            print(format(oxc$p.value, nsmall=nsmall, digits=digits))
-        }
-
-        {                               # Wilcoxon test
-            verbose("Open vs closed comparison --- accuracy")
-            acc_comparison <- t(mapply(function (o, c) { c(mean(y[[o]]), mean(y[[c]])) }, classifiers_open, classifiers_closed))
-            colnames(acc_comparison) <- c("open", "closed")
-            rownames(acc_comparison) <- classifiers
-            verbose(acc_comparison)
-
-            verbose("Wilcoxon test --- open vs close comparison --- p-values")
-            oxc = data.frame(alg=classifiers_open, p.value=rep(NA, length(classifiers_open)))
-            for (i in 1:7) oxc[i, 2] = round(wilcox.test(y[[classifiers_open[i]]], y[[classifiers_closed[i]]], paired=T)$p.value, 10)
-            oxc$alg <- classifiers
-            verbose(oxc)
-            print(format(oxc$p.value, nsmall=nsmall, digits=digits))
-        }
+        verbose(paste0("Sign test (", if(is.proposed.open) "open" else "closed", ") --- p-values with holm correction"))
+        zz <- round(p.adjust(as.numeric(p.values.raw[1, ]), method="holm"), 10)
+        names(zz) <- baselines
+        verbose(as.matrix(zz))
+        printLaTeXPValues(metric, proposed_method_wins, zz)
     }
 }
 
-run("na")                          # normalized accuracy
-run("mafm")                        # macro-averaging open-set f-measure
-run("mifm")                        # micro-averaging open-set f-measure
-run("bbmafm")                      # macro-averaging f-measure
-run("bbmifm")                      # micro-averaging f-measure
+runWilcoxon <- function(metric, classifiers, stat.file.type) {
+    verbose2(paste0(">>>>>>>>>>>>>>>> ", toupper(metric), " <<<<<<<<<<<<<<<<"))
+    stopifnot(classifiers[length(classifiers)] == proposed_method_open || classifiers[length(classifiers)] == proposed_method_closed)
+    proposed_method <- classifiers[length(classifiers)]
+    baselines <- classifiers[classifiers != proposed_method]
+    is.proposed.open <- proposed_method == proposed_method_open
+
+    nacc <- read.stat.file(metric, stat.file.type)
+    y <- spread(nacc, classifier, result)
+    yy <- y[, classifiers]
+
+    {
+        verbose(paste0("Wilcoxon test (", if(is.proposed.open) "open" else "closed", ") --- mean of the accuracy"))
+        aux <- as.matrix(colMeans(yy[, classifiers]))
+        verbose(aux)
+        proposed_method_wins <- aux[proposed_method, ] >= aux
+        verbose2(paste(paste0('(wilcoxon ', if(is.proposed.open) "open" else "closed", ') Methods with better results than proposed method:'), paste(rownames(proposed_method_wins)[! proposed_method_wins], collapse=', ')))
+        ## stopifnot(all(proposed_method_wins))
+
+        xnacc <- nacc %>% group_by(lenacs, dataset, classifier) %>% summarise(nacc=mean(result))
+        y <- spread(xnacc, classifier, nacc)
+        yy <- y[, classifiers]
+
+        p.values.raw <- yy %>% summarize_each_(funs(wilcox.test(., if(is.proposed.open) ssvmO else ssvmC, paired=T)$p.value), baselines)
+
+        zz <- round(p.adjust(as.numeric(p.values.raw[1, ]), method="holm"), 10)
+        names(zz) <- baselines
+        verbose(paste0("Wilcoxon test (", if(is.proposed.open) "open" else "closed", ") --- p-values with holm correction"))
+        verbose(as.matrix(zz))
+        printLaTeXPValues(metric, proposed_method_wins[-length(proposed_method_wins)], zz)
+    }
+}
+
+runBinomialOpenVsClosed <- function(metric) {
+    verbose2(paste0(">>>>>>>>>>>>>>>> ", toupper(metric), " <<<<<<<<<<<<<<<<"))
+    nacc <- read.stat.file(metric, "normal")
+    y <- spread(nacc, classifier, result)
+
+    {                               # Sign test
+        verbose("Sign test --- open vs closed comparison --- winning cases")
+        acc_comparison <- t(mapply(function (o, c) {
+            c(sum(mapply(function(vo, vc) vo > vc, y[[o]], y[[c]])), sum(mapply(function(vo, vc) vo < vc, y[[o]], y[[c]]))) }, classifiers_open, classifiers_closed))
+        colnames(acc_comparison) <- c("open", "closed")
+        rownames(acc_comparison) <- classifiers
+        verbose(acc_comparison)
+        openset_wins <- acc_comparison[, "open"] >= acc_comparison[, "closed"]
+        verbose2(paste('(sign openvsclosed) Methods for which its closed-set grid search version performs better:', paste(names(openset_wins[! openset_wins]), collapse=', ')))
+        ## stopifnot(all(openset_wins))
+
+        verbose("Sign test --- open vs close comparison --- p-values")
+        oxc <- data.frame(alg=classifiers_open, p.value=rep(NA, length(classifiers_open)))
+        for (i in 1:length(classifiers_open))
+            oxc[i, 2] <- round(binom.test(sum(y[[classifiers_open[i]]] > y[[classifiers_closed[i]]]), length(y[[classifiers_open[i]]]))$p.value, 10)
+        oxc$alg <- classifiers
+        verbose(oxc)
+        printLaTeXPValues(metric, openset_wins, oxc$p.value)
+    }
+}
+
+runWilcoxonOpenVsClosed <- function(metric) {
+    verbose2(paste0(">>>>>>>>>>>>>>>> ", toupper(metric), " <<<<<<<<<<<<<<<<"))
+    nacc <- read.stat.file(metric, "normal")
+    y <- spread(nacc, classifier, result)
+
+    {                               # Wilcoxon test
+        verbose("Wilcoxon test --- open vs closed comparison --- accuracy")
+        acc_comparison <- t(mapply(function (o, c) { c(mean(y[[o]]), mean(y[[c]])) }, classifiers_open, classifiers_closed))
+        colnames(acc_comparison) <- c("open", "closed")
+        rownames(acc_comparison) <- classifiers
+        verbose(acc_comparison)
+        openset_wins <- acc_comparison[, "open"] >= acc_comparison[, "closed"]
+        verbose2(paste('(wilcoxon openvsclosed) Methods for which its closed-set grid search version performs better:', paste(names(openset_wins[! openset_wins]), collapse=', ')))
+        ## stopifnot(all(openset_wins))
+
+        verbose("Wilcoxon test --- open vs close comparison --- p-values")
+        oxc <- data.frame(alg=classifiers_open, p.value=rep(NA, length(classifiers_open)))
+        for (i in 1:length(classifiers_open))
+            oxc[i, 2] <- round(wilcox.test(y[[classifiers_open[i]]], y[[classifiers_closed[i]]], paired=T)$p.value, 10)
+        oxc$alg <- classifiers
+        verbose(oxc)
+        printLaTeXPValues(metric, openset_wins, oxc$p.value)
+    }
+}
+
+measures <- c(
+    "na",                         # normalized accuracy
+    "harmonicNA",                 # harmonic normalized accuracy
+    "mafm",                       # macro-averaging open-set f-measure
+    "mifm",                       # micro-averaging open-set f-measure
+    "bbmafm",                     # macro-averaging f-measure
+    "bbmifm"                      # micro-averaging f-measure
+)
+
+print("runBinomial (open normal)")
+for(measure in measures) {
+    runBinomial(measure, classifiers_open, "normal")
+}
+cat("\n")
+print("runWilcoxon (open normal)")
+for(measure in measures) {
+    runWilcoxon(measure, classifiers_open, "normal")
+}
+cat("\n")
+print("runBinomial (closed normal)")
+for(measure in measures) {
+    runBinomial(measure, classifiers_closed, "normal")
+}
+cat("\n")
+print("runWilcoxon (closed normal)")
+for(measure in measures) {
+    runWilcoxon(measure, classifiers_closed, "normal")
+}
+cat("\n")
+print("runBinomialOpenVsClosed")
+for(measure in measures) {
+    runBinomialOpenVsClosed(measure)
+}
+cat("\n")
+print("runWilcoxonOpenVsClosed")
+for(measure in measures) {
+    runWilcoxonOpenVsClosed(measure)
+}
+
+cat("\n")
+print("runBinomial (OCBB)")
+for(measure in measures) {
+    runBinomial(measure, classifiers_open_ocbb, "ocbb")
+}
+cat("\n")
+print("runWilcoxon (OCBB)")
+for(measure in measures) {
+    runWilcoxon(measure, classifiers_open_ocbb, "ocbb")
+}
+
+cat("\n")
+print("runBinomial (unbalanced)")
+for(measure in measures) {
+    runBinomial(measure, classifiers_open_unbalanced, "unbalanced")
+}
+cat("\n")
+print("runWilcoxon (unbalanced)")
+for(measure in measures) {
+    runWilcoxon(measure, classifiers_open_unbalanced, "unbalanced")
+}
+
+cat("\n")
+print("runBinomial (open imagenet)")
+for(measure in measures) {
+    runBinomial(measure, classifiers_open, "onlyImageNet")
+}
+cat("\n")
+print("runWilcoxon (open imagenet)")
+for(measure in measures) {
+    runWilcoxon(measure, classifiers_open, "onlyImageNet")
+}
