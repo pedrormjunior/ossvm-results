@@ -50,13 +50,13 @@ printLaTeXPValues <- function(metric, booleans, pvalues) {
 read.stat.file <- function(metric, stat.file.type) {
     stopifnot(stat.file.type == "normal" || stat.file.type == "ocbb" || stat.file.type == "unbalanced" || stat.file.type == "onlyImageNet")
     switch(stat.file.type,
-           normal = read.csv(paste0("statcsv_ossvm_R1_normal/stat___", metric, ".csv")),
-           ocbb = read.csv(paste0("statcsv_ossvm_R1_normal_ocbb/stat___", metric, ".csv")),
-           unbalanced = read.csv(paste0("statcsv_ossvm_R1_unbalanced_open/stat___", metric, ".csv")),
-           onlyImageNet = read.csv(paste0("statcsv_ossvm_R1_onlyImageNet/stat___", metric, ".csv")))
+           normal = read.csv(paste0("statcsv_ossvm_R2_normal/stat___", metric, ".csv")),
+           ocbb = read.csv(paste0("statcsv_ossvm_R2_normal_ocbb/stat___", metric, ".csv")),
+           unbalanced = read.csv(paste0("statcsv_ossvm_R2_unbalanced_open/stat___", metric, ".csv")),
+           onlyImageNet = read.csv(paste0("statcsv_ossvm_R2_onlyImageNet/stat___", metric, ".csv")))
 }
 
-runBinomial <- function(metric, classifiers, stat.file.type) {
+runBinomial <- function(metric, classifiers, stat.file.type, datasetname) {
     verbose2(paste0(">>>>>>>>>>>>>>>> ", toupper(metric), " <<<<<<<<<<<<<<<<"))
     stopifnot(classifiers[length(classifiers)] == proposed_method_open || classifiers[length(classifiers)] == proposed_method_closed)
     proposed_method <- classifiers[length(classifiers)]
@@ -64,6 +64,10 @@ runBinomial <- function(metric, classifiers, stat.file.type) {
     is.proposed.open <- proposed_method == proposed_method_open
 
     nacc <- read.stat.file(metric, stat.file.type)
+    if(! missing(datasetname)) {
+        nacc <- nacc[nacc$dataset == datasetname,]
+        levels(nacc$dataset) <- factor(nacc$dataset)
+    }
     y <- spread(nacc, classifier, result)
     yy <- y[, classifiers]
 
@@ -87,7 +91,7 @@ runBinomial <- function(metric, classifiers, stat.file.type) {
     }
 }
 
-runWilcoxon <- function(metric, classifiers, stat.file.type) {
+runWilcoxon <- function(metric, classifiers, stat.file.type, datasetname) {
     verbose2(paste0(">>>>>>>>>>>>>>>> ", toupper(metric), " <<<<<<<<<<<<<<<<"))
     stopifnot(classifiers[length(classifiers)] == proposed_method_open || classifiers[length(classifiers)] == proposed_method_closed)
     proposed_method <- classifiers[length(classifiers)]
@@ -95,6 +99,10 @@ runWilcoxon <- function(metric, classifiers, stat.file.type) {
     is.proposed.open <- proposed_method == proposed_method_open
 
     nacc <- read.stat.file(metric, stat.file.type)
+    if(! missing(datasetname)) {
+        nacc <- nacc[nacc$dataset == datasetname,]
+        levels(nacc$dataset) <- factor(nacc$dataset)
+    }
     y <- spread(nacc, classifier, result)
     yy <- y[, classifiers]
 
@@ -106,9 +114,15 @@ runWilcoxon <- function(metric, classifiers, stat.file.type) {
         verbose2(paste(paste0('(wilcoxon ', if(is.proposed.open) "open" else "closed", ') Methods with better results than proposed method:'), paste(rownames(proposed_method_wins)[! proposed_method_wins], collapse=', ')))
         ## stopifnot(all(proposed_method_wins))
 
-        xnacc <- nacc %>% group_by(lenacs, dataset, classifier) %>% summarise(nacc=mean(result))
-        y <- spread(xnacc, classifier, nacc)
-        yy <- y[, classifiers]
+        if(length(table(nacc$dataset)) > 1) {
+            ## When performing statistical test among several
+            ## datasets, perform the mean of the 10 experiments
+            ## performed for each number of available classes, for
+            ## each dataset, and for each method.
+            xnacc <- nacc %>% group_by(lenacs, dataset, classifier) %>% summarise(nacc=mean(result))
+            y <- spread(xnacc, classifier, nacc)
+            yy <- y[, classifiers]
+        }
 
         p.values.raw <- yy %>% summarize_each_(funs(wilcox.test(., if(is.proposed.open) ssvmO else ssvmC, paired=T)$p.value), baselines)
 
@@ -120,9 +134,13 @@ runWilcoxon <- function(metric, classifiers, stat.file.type) {
     }
 }
 
-runBinomialOpenVsClosed <- function(metric) {
+runBinomialOpenVsClosed <- function(metric, datasetname) {
     verbose2(paste0(">>>>>>>>>>>>>>>> ", toupper(metric), " <<<<<<<<<<<<<<<<"))
     nacc <- read.stat.file(metric, "normal")
+    if(! missing(datasetname)) {
+        nacc <- nacc[nacc$dataset == datasetname,]
+        levels(nacc$dataset) <- factor(nacc$dataset)
+    }
     y <- spread(nacc, classifier, result)
 
     {                               # Sign test
@@ -146,9 +164,13 @@ runBinomialOpenVsClosed <- function(metric) {
     }
 }
 
-runWilcoxonOpenVsClosed <- function(metric) {
+runWilcoxonOpenVsClosed <- function(metric, datasetname) {
     verbose2(paste0(">>>>>>>>>>>>>>>> ", toupper(metric), " <<<<<<<<<<<<<<<<"))
     nacc <- read.stat.file(metric, "normal")
+    if(! missing(datasetname)) {
+        nacc <- nacc[nacc$dataset == datasetname,]
+        levels(nacc$dataset) <- factor(nacc$dataset)
+    }
     y <- spread(nacc, classifier, result)
 
     {                               # Wilcoxon test
@@ -180,6 +202,14 @@ measures <- c(
     "bbmifm"                      # micro-averaging f-measure
 )
 
+datasets <- c(
+    "15scenes_bow_soft_max_1000",
+    "aloi_bic",
+    "auslan",
+    "caltech256_bow_dense_hard_average_1000",
+    "letter"
+)
+
 print("runBinomial (open normal)")
 for(measure in measures) {
     runBinomial(measure, classifiers_open, "normal")
@@ -208,6 +238,40 @@ cat("\n")
 print("runWilcoxonOpenVsClosed")
 for(measure in measures) {
     runWilcoxonOpenVsClosed(measure)
+}
+
+for(datasetname in datasets) {
+    cat("\n")
+    print(datasetname)
+    print("runBinomial (open normal)")
+    for(measure in measures) {
+        runBinomial(measure, classifiers_open, "normal", datasetname)
+    }
+    cat("\n")
+    print("runWilcoxon (open normal)")
+    for(measure in measures) {
+        runWilcoxon(measure, classifiers_open, "normal", datasetname)
+    }
+    cat("\n")
+    print("runBinomial (closed normal)")
+    for(measure in measures) {
+        runBinomial(measure, classifiers_closed, "normal", datasetname)
+    }
+    cat("\n")
+    print("runWilcoxon (closed normal)")
+    for(measure in measures) {
+        runWilcoxon(measure, classifiers_closed, "normal", datasetname)
+    }
+    cat("\n")
+    print("runBinomialOpenVsClosed")
+    for(measure in measures) {
+        runBinomialOpenVsClosed(measure, datasetname)
+    }
+    cat("\n")
+    print("runWilcoxonOpenVsClosed")
+    for(measure in measures) {
+        runWilcoxonOpenVsClosed(measure, datasetname)
+    }
 }
 
 cat("\n")

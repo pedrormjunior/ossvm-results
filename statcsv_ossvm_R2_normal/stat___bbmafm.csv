@@ -1306,7 +1306,7 @@ lenacs,dataset,classifier,experiment,result
 3,auslan,ssvmC,5,0.412166053003
 3,auslan,ssvmC,6,0.40920261901
 3,auslan,ssvmC,7,0.411685890704
-3,auslan,ssvmC,8,0.397645683163
+3,auslan,ssvmC,8,0.413606607215
 3,auslan,ssvmC,9,0.409903896499
 3,auslan,ssvmC,10,0.410593025985
 3,auslan,ssvmO,1,0.641748426627
@@ -1953,7 +1953,7 @@ lenacs,dataset,classifier,experiment,result
 3,caltech256_bow_dense_hard_average_1000,ssvmO,2,0.27883541386
 3,caltech256_bow_dense_hard_average_1000,ssvmO,3,0.258983056916
 3,caltech256_bow_dense_hard_average_1000,ssvmO,4,0.332204546412
-3,caltech256_bow_dense_hard_average_1000,ssvmO,5,0.275693449369
+3,caltech256_bow_dense_hard_average_1000,ssvmO,5,0.276123328189
 3,caltech256_bow_dense_hard_average_1000,ssvmO,6,0.27116388212
 3,caltech256_bow_dense_hard_average_1000,ssvmO,7,0.358208637752
 3,caltech256_bow_dense_hard_average_1000,ssvmO,8,0.337261529909
@@ -2588,7 +2588,7 @@ lenacs,dataset,classifier,experiment,result
 3,letter,ssvmC,7,0.609770518254
 3,letter,ssvmC,8,0.508051199865
 3,letter,ssvmC,9,0.576416289087
-3,letter,ssvmC,10,0.508920766694
+3,letter,ssvmC,10,0.51370788069
 3,letter,ssvmO,1,0.831371856509
 3,letter,ssvmO,2,0.690306817287
 3,letter,ssvmO,3,0.725181293581
@@ -2756,7 +2756,7 @@ lenacs,dataset,classifier,experiment,result
 6,letter,ssvmO,5,0.738814009142
 6,letter,ssvmO,6,0.771137881291
 6,letter,ssvmO,7,0.75633381886
-6,letter,ssvmO,8,0.700431360331
+6,letter,ssvmO,8,0.701219306186
 6,letter,ssvmO,9,0.763312171732
 6,letter,ssvmO,10,0.797804448368
 6,letter,svddC,1,0.187380224506

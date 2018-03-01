@@ -6,7 +6,7 @@ If requirements are satisfied, just type `make` from the command line to perform
 
 ## Raw data
 
-Files in [normal](statcsv_ossvm_R1_normal/), [ocbb](statcsv_ossvm_R1_normal_ocbb/), [onlyImageNet](statcsv_ossvm_R1_onlyImageNet/), and [unbalanced](statcsv_ossvm_R1_unbalanced_open/) directories contain the raw data.
+Files in [normal](statcsv_ossvm_R2_normal/), [ocbb](statcsv_ossvm_R2_normal_ocbb/), [onlyImageNet](statcsv_ossvm_R2_onlyImageNet/), and [unbalanced](statcsv_ossvm_R2_unbalanced_open/) directories contain the raw data.
 [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) files are named `stat___<measure>.csv`, in which `<measure>` can be one of the following.
 - `na` Normalized accuracy (![](figs/na.png))
 - `harmonicNA` Harmonic normalized accuracy (![](figs/hna.png))

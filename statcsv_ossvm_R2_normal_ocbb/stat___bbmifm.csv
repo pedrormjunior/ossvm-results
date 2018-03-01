@@ -873,7 +873,7 @@ lenacs,dataset,classifier,experiment,result
 3,caltech256_bow_dense_hard_average_1000,ssvmO,2,0.762716441084
 3,caltech256_bow_dense_hard_average_1000,ssvmO,3,0.980728340477
 3,caltech256_bow_dense_hard_average_1000,ssvmO,4,0.597844448949
-3,caltech256_bow_dense_hard_average_1000,ssvmO,5,0.933956533477
+3,caltech256_bow_dense_hard_average_1000,ssvmO,5,0.937398758099
 3,caltech256_bow_dense_hard_average_1000,ssvmO,6,0.964525601647
 3,caltech256_bow_dense_hard_average_1000,ssvmO,7,0.917860294617
 3,caltech256_bow_dense_hard_average_1000,ssvmO,8,0.731052181352
@@ -1226,7 +1226,7 @@ lenacs,dataset,classifier,experiment,result
 6,letter,ssvmO,5,0.870940412313
 6,letter,ssvmO,6,0.917414620378
 6,letter,ssvmO,7,0.869048965283
-6,letter,ssvmO,8,0.760596812479
+6,letter,ssvmO,8,0.767491805132
 6,letter,ssvmO,9,0.831795800555
 6,letter,ssvmO,10,0.853209974049
 6,letter,svddbbC,1,0.666138524219
