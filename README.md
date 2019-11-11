@@ -2,8 +2,8 @@
 # Specialized Support Vector Machines (SSVM) — Results
 
 In this repository, we provide the raw results obtained from the experiments accomplished in the paper entitled "Specialized Support Vector Machines for Open-set Recognition".
-We also provide the scripts we have employed for performing the statistical tests and generating diagrams and tables present in the paper.
-For generating those diagrams and tables, it is required to have [Python 2](https://www.python.org/), [R](https://cran.r-project.org/) and [GNU make](https://www.gnu.org/software/make/) installed.
+We also provide the scripts we have employed for performing the statistical tests and generating diagrams present in the paper.
+For generating those diagrams, it is required to have [Python 2](https://www.python.org/) and [GNU make](https://www.gnu.org/software/make/) installed.
 
 ## Raw data
 
@@ -27,6 +27,8 @@ Repr. | Description | Acronym
 `OSFMm` | Micro-Averaging Open-Set F-Measure | ![](figs/OSFMm.png)
 `FMM` | Multiclass Macro-Averaging F-Measure | ![](figs/FMM.png)
 `FMm` | Multiclass Micro-Averaging F-Measure | ![](figs/FMm.png)
+`AKS` | Accuracy on Known Samples | ![](figs/AKS.png)
+`AUS` | Accuracy on Unknown Samples | ![](figs/AUS.png)
 
 Evaluated methods include:
 
@@ -43,6 +45,10 @@ Repr. | Description | Acronym | Reference
 `ssvm` | Specialized SVM | ![](figs/ssvm.png) | **Proposed method**
 
 The suffix `O` or `C` in the representation name of each of those classifiers indicate if it was trained by performing open- or closed-set grid search approach, respectively.
+
+**Note:**
+As stated in our manuscript, in this work we have discussed only the experiments with open-set grid search, as previous work have shown it to be superior to closed-set grid search.
+For reproducibility of the results presented in the manuscript, one should employ only the data with suffix `O` although below we also present the Critical Difference’s diagrams for all methods implemented with closed-set grid search as well.
 
 ## Generating Critical Difference’s diagrams
 
@@ -66,30 +72,10 @@ It will generate the CD diagrams inside the `CD_diagrams/` directory.
 
 The main script responsible for generating the diagrams is [plot_CD.py](plot_CD.py).
 
-Generated diagrams are shown in [Critical Difference’s diagrams](#critical-differences-diagrams) below.
-
-## Generating open- versus closed-set results
-
-For generating Wilcoxon and Binomial statistical tests for comparison of open- and closed-set grid search strategies, R is required as well as its packages `dplyr` and `tidyr`.
-For generating a PDF table (optional), `pdflatex` is required.
-For obtaining the _p_-values, run:
-
-```shell
-> make GS_comparison
-```
-
-
-Results will be in `*.tex` files in `tables_openvsclosed/` directory.
-
-The script responsible for generating the statistical comparison is [openvsclosed.R](openvsclosed.R).
-
-Generated results are depicted in [Open- and closed-set grid search comparison](#open--and-closed-set-grid-search-comparison) below.
-
 ## Critical Difference’s diagrams
 
-Here we show the CD diagrams generated following the instructions in [Generating Critical Difference’s diagrams](#generating-critical-differences-diagrams).
-
 **Note:** In our paper, we have included only the CD diagrams referring to the column “**Open-set grid search**” herein.
+This supplementary material contains CD diagrams also for AKS and AUS measures, which are not presented in the paper.
 
 <table>
 	<tr><th>Open-set grid search</th><th>Closed-set grid search</th></tr>
@@ -111,20 +97,10 @@ Here we show the CD diagrams generated following the instructions in [Generating
 	<!-- FMm -->
 	<tr><td align="middle" colspan="2"><b>Multiclass Micro-averaging F-Measure — <img src="figs/FMm.png" /></b></td></tr>
 	<tr><td><img src="CD_diagrams/CD_normal_FMm_O.png" /></td><td><img src="CD_diagrams/CD_normal_FMm_C.png" /></td></tr>
+	<!-- AKS -->
+	<tr><td align="middle" colspan="2"><b>Normalized Accuracy — <img src="figs/AKS.png" /></b></td></tr>
+	<tr><td><img src="CD_diagrams/CD_normal_AKS_O.png" /></td><td><img src="CD_diagrams/CD_normal_AKS_C.png" /></td></tr>
+	<!-- AUS -->
+	<tr><td align="middle" colspan="2"><b>Normalized Accuracy — <img src="figs/AUS.png" /></b></td></tr>
+	<tr><td><img src="CD_diagrams/CD_normal_AUS_O.png" /></td><td><img src="CD_diagrams/CD_normal_AUS_C.png" /></td></tr>
 </table>
-
-## Open- and closed-set grid search comparison
-
-In the following images we present raw _p_-values obtained with Wilcoxon and Binomial statistical tests.
-Those are the _p_-values generated following the instructions in [Generating open- versus closed-set results](#generating-open--versus-closed-set-results).
-In those images:
-- **Bold** means there is statistical difference with 95% of confidence.
-- The **\*** indicates the statistical difference is with 99% of confidence.
-- And **<.0001\*** indicates the statistical difference is with 99.99% of confidence.
-- **Emphasized in red** means the version with closed-set grid search obtains better performance for measure associated with that row.
-
-![Table](tables_openvsclosed/table-wilcoxon.png)
-_**Wilcoxon** statistical tests for the pairwise comparison between open- and closed-set grid search implementation for every method and every measure._
-
-![Table](tables_openvsclosed/table-binomial.png)
-_**Binomial** statistical tests for the pairwise comparison between open- and closed-set grid search implementation for every method and every measure._
