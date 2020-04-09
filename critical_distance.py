@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8; -*-
 
 # The piece of code herein were obtained from Orange package available
@@ -141,8 +141,13 @@ def graph_ranks(filename, avranks, names, cd=None, cdmethod=None, lowv=None, hig
     from matplotlib.backends.backend_agg import FigureCanvasAgg
 
     def print_figure(fig, *args, **kwargs):
+        assert len(args) == 1, args
         canvas = FigureCanvasAgg(fig)
-        canvas.print_figure(bbox_inches='tight', pad_inches=0, *args, **kwargs)
+        filename, = args
+        if filename.endswith('.png'):
+            canvas.print_png(filename, bbox_inches='tight', pad_inches=0, **kwargs)
+        else:
+            canvas.print_figure(filename, bbox_inches='tight', pad_inches=0, **kwargs)
 
 
     sums = avranks
@@ -190,7 +195,8 @@ def graph_ranks(filename, avranks, names, cd=None, cdmethod=None, lowv=None, hig
             notSig = [ (i, j) for i, j in allpairs if abs(sums[i] - sums[j]) <= hsd ]
 
             #keep only longest
-            def no_longer((i, j), notSig):
+            def no_longer(x, notSig):
+                i, j = x
                 for i1, j1 in notSig:
                     if (i1 <= i and j1 > j) or (i1 < i and j1 >= j):
                         return False
@@ -258,12 +264,12 @@ def graph_ranks(filename, avranks, names, cd=None, cdmethod=None, lowv=None, hig
 
     k = len(ssums)
 
-    for i in range((k + 1) / 2):
+    for i in range((k + 1) // 2):
         chei = cline + minnotsignificant + i * 0.2
         line([(rankpos(ssums[i]), cline), (rankpos(ssums[i]), chei), (textspace - 0.1, chei)], linewidth=0.7)
         text(textspace - 0.2, chei, nnames[i], ha="right", va="center")
 
-    for i in range((k + 1) / 2, k):
+    for i in range((k + 1) // 2, k):
         chei = cline + minnotsignificant + (k - i - 1) * 0.2
         line([(rankpos(ssums[i]), cline), (rankpos(ssums[i]), chei), (textspace + scalewidth + 0.1, chei)], linewidth=0.7)
         text(textspace + scalewidth + 0.2, chei, nnames[i], ha="left", va="center")

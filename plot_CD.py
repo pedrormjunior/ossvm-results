@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8; -*-
 
 # Plot Critical Difference diagrams according to [1].
@@ -126,8 +126,8 @@ if __name__ == '__main__':
             df = pd.read_csv(csv_path)
 
             # Select data by grid search type (open or closed).
-            df = df[map(lambda classifier: classifier.endswith(gs),
-                        df.classifier)]
+            df = df[list(map(lambda classifier: classifier.endswith(gs),
+                             df.classifier))]
             df = mean_experiments(df)
             assert control_method in set(df.classifier), \
                 (control_method, set(df.classifier))
