@@ -85,10 +85,10 @@ results_csv = [
     'HNA.csv',
     'AKS.csv',
     'AUS.csv',
-    'OSFMM.csv',
-    'OSFMm.csv',
-    'FMM.csv',
-    'FMm.csv',
+    'OSFMmacro.csv',
+    'OSFMmicro.csv',
+    'FMmacro.csv',
+    'FMmicro.csv',
 ]
 
 def mean_experiments(df):

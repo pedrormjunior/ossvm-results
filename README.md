@@ -23,10 +23,10 @@ Repr. | Description | Acronym
 -|-|-
 `NA` | Normalized Accuracy | ![](figs/NA.png)
 `HNA` | Harmonic Normalized Accuracy | ![](figs/HNA.png)
-`OSFMM` | Macro-Averaging Open-Set F-Measure | ![](figs/OSFMM.png)
-`OSFMm` | Micro-Averaging Open-Set F-Measure | ![](figs/OSFMm.png)
-`FMM` | Multiclass Macro-Averaging F-Measure | ![](figs/FMM.png)
-`FMm` | Multiclass Micro-Averaging F-Measure | ![](figs/FMm.png)
+`OSFMmacro` | Macro-Averaging Open-Set F-Measure | ![](figs/OSFMmacro.png)
+`OSFMmicro` | Micro-Averaging Open-Set F-Measure | ![](figs/OSFMmicro.png)
+`FMmacro` | Multiclass Macro-Averaging F-Measure | ![](figs/FMmacro.png)
+`FMmicro` | Multiclass Micro-Averaging F-Measure | ![](figs/FMmicro.png)
 `AKS` | Accuracy on Known Samples | ![](figs/AKS.png)
 `AUS` | Accuracy on Unknown Samples | ![](figs/AUS.png)
 
@@ -85,18 +85,18 @@ This supplementary material contains CD diagrams also for AKS and AUS measures, 
 	<!-- HNA -->
 	<tr><td align="middle" colspan="2"><b>Harmonic Normalized Accuracy — <img src="figs/HNA.png" /></b></td></tr>
 	<tr><td><img src="CD_diagrams/CD_normal_HNA_O.png" /></td><td><img src="CD_diagrams/CD_normal_HNA_C.png" /></td></tr>
-	<!-- OSFMM -->
-	<tr><td align="middle" colspan="2"><b>Macro-averaging Open-Set F-Measure — <img src="figs/OSFMM.png" /></b></td></tr>
-	<tr><td><img src="CD_diagrams/CD_normal_OSFMM_O.png" /></td><td><img src="CD_diagrams/CD_normal_OSFMM_C.png" /></td></tr>
-	<!-- OSFMm -->
-	<tr><td align="middle" colspan="2"><b>Micro-averaging Open-Set F-Measure — <img src="figs/OSFMm.png" /></b></td></tr>
-	<tr><td><img src="CD_diagrams/CD_normal_OSFMm_O.png" /></td><td><img src="CD_diagrams/CD_normal_OSFMm_C.png" /></td></tr>
-	<!-- FMM -->
-	<tr><td align="middle" colspan="2"><b>Multiclass Macro-averaging F-Measure — <img src="figs/FMM.png" /></b></td></tr>
-	<tr><td><img src="CD_diagrams/CD_normal_FMM_O.png" /></td><td><img src="CD_diagrams/CD_normal_FMM_C.png" /></td></tr>
-	<!-- FMm -->
-	<tr><td align="middle" colspan="2"><b>Multiclass Micro-averaging F-Measure — <img src="figs/FMm.png" /></b></td></tr>
-	<tr><td><img src="CD_diagrams/CD_normal_FMm_O.png" /></td><td><img src="CD_diagrams/CD_normal_FMm_C.png" /></td></tr>
+	<!-- OSFMmacro -->
+	<tr><td align="middle" colspan="2"><b>Macro-averaging Open-Set F-Measure — <img src="figs/OSFMmacro.png" /></b></td></tr>
+	<tr><td><img src="CD_diagrams/CD_normal_OSFMmacro_O.png" /></td><td><img src="CD_diagrams/CD_normal_OSFMmacro_C.png" /></td></tr>
+	<!-- OSFMmicro -->
+	<tr><td align="middle" colspan="2"><b>Micro-averaging Open-Set F-Measure — <img src="figs/OSFMmicro.png" /></b></td></tr>
+	<tr><td><img src="CD_diagrams/CD_normal_OSFMmicro_O.png" /></td><td><img src="CD_diagrams/CD_normal_OSFMmicro_C.png" /></td></tr>
+	<!-- FMmacro -->
+	<tr><td align="middle" colspan="2"><b>Multiclass Macro-averaging F-Measure — <img src="figs/FMmacro.png" /></b></td></tr>
+	<tr><td><img src="CD_diagrams/CD_normal_FMmacro_O.png" /></td><td><img src="CD_diagrams/CD_normal_FMmacro_C.png" /></td></tr>
+	<!-- FMmicro -->
+	<tr><td align="middle" colspan="2"><b>Multiclass Micro-averaging F-Measure — <img src="figs/FMmicro.png" /></b></td></tr>
+	<tr><td><img src="CD_diagrams/CD_normal_FMmicro_O.png" /></td><td><img src="CD_diagrams/CD_normal_FMmicro_C.png" /></td></tr>
 	<!-- AKS -->
 	<tr><td align="middle" colspan="2"><b>Normalized Accuracy — <img src="figs/AKS.png" /></b></td></tr>
 	<tr><td><img src="CD_diagrams/CD_normal_AKS_O.png" /></td><td><img src="CD_diagrams/CD_normal_AKS_C.png" /></td></tr>

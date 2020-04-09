@@ -14,9 +14,9 @@ fontsize=10
 
 /home/pedrormjunior/Downloads/tex2im/tex2im -z -a -o figs/NA.png -s ${fontsize} "\mathrm{NA}"
 /home/pedrormjunior/Downloads/tex2im/tex2im -z -a -o figs/HNA.png -s ${fontsize} "\mathrm{HNA}"
-/home/pedrormjunior/Downloads/tex2im/tex2im -z -a -o figs/OSFMM.png -s ${fontsize} "\mathrm{OSFM}_{\mbox{\scriptsize M}}"
-/home/pedrormjunior/Downloads/tex2im/tex2im -z -a -o figs/OSFMm.png -s ${fontsize} "\mathrm{OSFM}_{\mu}"
-/home/pedrormjunior/Downloads/tex2im/tex2im -z -a -o figs/FMM.png -s ${fontsize} "\mathrm{FM}_{\mbox{\scriptsize M}}"
-/home/pedrormjunior/Downloads/tex2im/tex2im -z -a -o figs/FMm.png -s ${fontsize} "\mathrm{FM}_{\mu}"
+/home/pedrormjunior/Downloads/tex2im/tex2im -z -a -o figs/OSFMmacro.png -s ${fontsize} "\mathrm{OSFM}_{\mbox{\scriptsize M}}"
+/home/pedrormjunior/Downloads/tex2im/tex2im -z -a -o figs/OSFMmicro.png -s ${fontsize} "\mathrm{OSFM}_{\mu}"
+/home/pedrormjunior/Downloads/tex2im/tex2im -z -a -o figs/FMmacro.png -s ${fontsize} "\mathrm{FM}_{\mbox{\scriptsize M}}"
+/home/pedrormjunior/Downloads/tex2im/tex2im -z -a -o figs/FMmicro.png -s ${fontsize} "\mathrm{FM}_{\mu}"
 /home/pedrormjunior/Downloads/tex2im/tex2im -z -a -o figs/AKS.png -s ${fontsize} "\mathrm{AKS}"
 /home/pedrormjunior/Downloads/tex2im/tex2im -z -a -o figs/AUS.png -s ${fontsize} "\mathrm{AUS}"
