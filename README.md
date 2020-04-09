@@ -3,7 +3,7 @@
 
 In this repository, we provide the raw results obtained from the experiments accomplished in the paper entitled "Specialized Support Vector Machines for Open-set Recognition".
 We also provide the scripts we have employed for performing the statistical tests and generating diagrams present in the paper.
-For generating those diagrams, it is required to have [Python 2](https://www.python.org/) and [GNU make](https://www.gnu.org/software/make/) installed.
+For generating those diagrams, it is required to have [Python 3](https://www.python.org/) and [GNU make](https://www.gnu.org/software/make/) installed.
 
 ## Raw data
 
