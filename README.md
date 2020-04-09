@@ -52,12 +52,12 @@ For reproducibility of the results presented in the manuscript, one should emplo
 
 ## Generating Critical Difference’s diagrams
 
-For generating the Critical Difference (CD) diagrams, Python 2 is required.
+For generating the Critical Difference (CD) diagrams, Python 3 is required.
 The required packages are specified in [requirements.txt](requirements.txt).
 For installation of the required packages, run:
 
 ```shell
-> pip install -r requirements.txt
+> pip3 install -r requirements.txt
 ```
 
 
