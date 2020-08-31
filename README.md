@@ -1,7 +1,7 @@
 <!-- -*- eval: (git-gutter-mode); -*- -->
-# Specialized Support Vector Machines (SSVM) — Results
+# Open-Set Support Vector Machines (OSSVM) — Results
 
-In this repository, we provide the raw results obtained from the experiments accomplished in the paper entitled "Specialized Support Vector Machines for Open-set Recognition".
+In this repository, we provide the raw results obtained from the experiments accomplished in the paper entitled "Open-Set Support Vector Machines".
 We also provide the scripts we have employed for performing the statistical tests and generating diagrams present in the paper.
 For generating those diagrams, it is required to have [Python 3](https://www.python.org/) and [GNU make](https://www.gnu.org/software/make/) installed.
 
@@ -42,7 +42,7 @@ Repr. | Description | Acronym | Reference
 `wsvm` | Weibull-calibrated SVM | ![](figs/wsvm.png) | Walter J. Scheirer, Lalit P. Jain, and Terrance E. Boult. [Probability models for open set recognition](https://doi.org/10.1109/TPAMI.2014.2321392). _**IEEE Transactions on Pattern Analysis and Machine Intelligence**_, 36(11):2317–2324, November 2014.
 `pisvm` | SVM with Probability of Inclusion | ![](figs/pisvm.png) | Lalit P. Jain, Walter J. Scheirer, and Terrance E. Boult. [Multi-class open set recognition using probability of inclusion](https://doi.org/10.1007/978-3-319-10578-9_26). In _**European Conference on Computer Vision**_, volume 8691, part III of Lecture Notes in Computer Science, pages 393–409, September 2014.
 `evm` | Extreme Value Machine | ![](figs/evm.png) | Ethan M. Rudd, Lalit P. Jain, Walter J. Scheirer, and Terrance E. Boult. [The Extreme Value Machine](https://doi.org/10.1109/TPAMI.2017.2707495). _**IEEE Transactions on Pattern Analysis and Machine Intelligence**_, 40(3):762–768, March 2018.
-`ssvm` | Specialized SVM | ![](figs/ssvm.png) | **Proposed method**
+`ssvm` | Open-Set SVM | ![](figs/ssvm.png) | **Proposed method**
 
 The suffix `O` or `C` in the representation name of each of those classifiers indicate if it was trained by performing open- or closed-set grid search approach, respectively.
 
